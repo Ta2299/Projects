@@ -1,0 +1,256 @@
+---
+title: 'CIND 123 - Data Analytics: Basic Methods Fall 2021 Assignment 3'
+author: 
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+<center> <h1> Assignment 3 (10%) </h1> </center>
+<center>  <h3> [Tara Shingadia] </h2> </center>
+<center> <h3> [CIND123 D10 & 500847789] </h2> </center>
+---
+## Instructions 
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. Review this website for more details on using R Markdown <http://rmarkdown.rstudio.com>.
+
+Use RStudio for this assignment. Complete the assignment by inserting your R code wherever you see the string "#INSERT YOUR ANSWER HERE".
+
+When you click the **Knit** button, a document (PDF, Word, or HTML format) will be generated that includes both the assignment content as well as the output of any embedded R code chunks.
+
+Submit **both**  the rmd and generated output files. Failing to submit both files will be subject to mark deduction.
+
+
+## Sample Question and Solution
+
+Use `seq()` to create the vector $(2,4,6,\ldots,20)$.
+
+```{r}
+#Insert your code here.
+seq(2,20,by = 2)
+```
+### Note:
+
+You will use 'Admission_Predict.csv' for Assignment-3. This dataset includes the data of the applicants of an academic program. Each application has a unique serial number, which represents a particular student. The dataset contains several parameters which are considered important during the application for Masters Programs.
+The parameters included are :
+
+1) GRE Scores (out of 340)
+
+2) TOEFL Scores (out of 120)
+
+3) University Rating (out of 5)
+
+4) Statement of Purpose (SOP) (out of 5)
+
+5) Letter of Recommendation (LOR) Strength (out of 5)
+
+6) Undergraduate GPA (out of 10)
+
+7) Research Experience (either 0 or 1)
+
+8) Chance of Admit (ranging from 0 to 1)
+
+
+**Download "Admission_Predict.csv" dataset and load it as 'data'.**
+```{r}
+#Insert your code here.
+data <- read.csv("Admission_Predict.csv")
+```
+
+
+## Question 1 (30 points in total)
+
+
+a)
+
+  i- Display the first three rows in this dataset.(1 point)
+```{r}
+#Insert your code here.
+head(data, 3)
+```
+
+
+  ii - Display the structure of all variables.(1 point)
+```{r}
+#Insert your code here.
+str(data)
+```
+  
+
+  iii - Print the descriptive statistics of the admission data to understand the    data a little better (min, max, mean, median, 1st and 3rd quartiles). (1 point)
+```{r}
+#Insert your code here.
+summary(data)
+```
+  
+
+  iv - Use a histogram to assess the normality of the 'Chance.of.Admit' variable    and explain whether it appears normally distributed or not and why? (1 point)
+
+```{r}
+
+#Insert your code here.
+hist(data$Chance.of.Admit, xlab = 'Chance of Admit', main = 'Histogram of Chance of Admit')
+#it does not appear to be normally distributed as the histogram shows it is skewed to the left 
+```
+
+b)   Create a set of boxplots that shows the distribution of Chance.of.Admit on SOP variables. Use different colors for different SOP score marks. Hint: SOP scores are changing between 1,1.5, to 5, therefore you can use different box colours for each score likewise; 1 (red), 1.5(green), etc. (8 points)
+```{r}
+#Insert your code here.
+colours = c('firebrick1','darkorange','goldenrod1','darkolivegreen1','cadetblue1','deepskyblue2','mediumpurple1', 'mediumorchid1', 'palevioletred1')
+boxplot(data$Chance.of.Admit ~ data$SOP, ylab = 'Chance of Admit', xlab = 'SOP', col=colours, main = 'Distribution of Chance of Admit on SOP')
+``` 
+
+c) 
+
+i- Find the covariance between the "GRE.Score" and the "Chance.of.Admit". (3 points)
+
+```{r}
+
+#Insert your code here.
+cov(data$GRE.Score, data$Chance.of.Admit)
+```
+
+ii- Print or plot the correlation matrix of the data and write down the correlations between the GRE.Score, TOEFL.Score, CGPA and the Chance.of.Admit. (3 points)
+
+```{r}
+
+#Insert your code here.
+matrix1 <- cor(data[c('GRE.Score','TOEFL.Score','CGPA', 'Chance.of.Admit')])
+matrix1
+#install.packages('corrplot')
+library(corrplot)
+corrplot(matrix1, method = 'number')
+```
+
+iii - Interpret the covariance and correlation results obtained from c(i) and c(ii) in terms of the strength and direction of the relationship. (4 points)
+```{r}
+#Insert your code here.
+#The CGPA has the highest positive correlation with the chance of admission followed by the GRE Score and then the TOEFL score
+#The co-variance also tells us that the GRE.Score is strongly correlated with the chance of admission
+```
+
+d)  Use ggplot() to plot the graphs to see the relationship between each of three variables (GRE.Score, TOEFL.Score, CGPA) with Chance.of.Admit. (8 points)
+```{r}
+
+#Insert your code here.
+library(ggplot2)
+ggplot(data = data, aes(x=GRE.Score, y=Chance.of.Admit)) + geom_point()
+ggplot(data = data, aes(x=TOEFL.Score, y=Chance.of.Admit)) + geom_point()
+ggplot(data = data, aes(x=CGPA, y=Chance.of.Admit)) + geom_point()
+```
+
+## Question 2 (40 points in total)
+
+
+a) 
+
+i- Define the linear regression model  between  GRE.Score and Chance.of.Admit (3 points)
+
+
+```{r}
+#Insert your code here.
+model2 <- lm(Chance.of.Admit ~ GRE.Score, data = data)
+model2
+```
+
+ii - Plot the regression (least-square) line on the same plot.(3 points)
+```{r}
+
+#Insert your code here.
+plot(Chance.of.Admit ~ GRE.Score, data = data)
+abline(model2)
+```
+
+
+ii- -  Explain the meaning of the slope and y-intercept for the least-squares regression line in Q2(ii). (3 points)
+
+```{r}
+#Insert your code here.
+#The meaning of the slope is that the higher your GRE Score, the chance of being admitted positively increases. The y-intercept shows a GRE score of 0 would have a chance of admission of less than 0. Also a GRE score of 290 would have a chance of admission of 0.3
+
+```
+b) Print the results of this model and interpret the results by following questions:
+
+i -  What is the number of observations was the regression run on? (3 points)
+```{r}
+
+#Insert your code here.
+summary(model2)
+nobs(model2)
+#400 observations
+```
+
+ii -  Interpret the R-squared of this regression? (4 points)
+```{r}
+
+#Insert your code here.
+#The R squared for this regression is 0.6442
+```
+
+iii -  Write the regression equation associated with this regression model? (4 points)
+```{r}
+#regression equation: -2.4360842 + 0.0099759 * GRE.Score
+ 
+```
+
+c) Use the regression line to predict the chance of admit when GRE score 310. (10 points)
+```{r}
+
+#Insert your code here.
+predict(model2, newdata = data.frame(GRE.Score = 310))
+
+```
+
+d) From the given Q2(a) linear model between GRE.Score and Chance.of.Admit, what should be GRE score of a student who has 50% of chance of admission?(10 points)
+
+```{r}
+#Insert your code here.
+#-2.4360842 + 0.0099759 * GRE.Score = 0.50
+#GRE.Score = (0.50 + 2.4360842)/0.0099759 
+          (0.50 + 2.4360842)/0.0099759 
+# GRE.Score = 294.3177 for a student who has a 50% chance of admission
+
+```
+
+## Question 3 (30 points in total)
+
+a) Use three independent variables ('GRE.Score','TOEFL.Score', 'CGPA')  to build a multiple linear regression model to predict dependent variable 'Chance.of.Admit'. Display a summary of your model indicating Residuals, Coefficients, etc. Explain the summary results. (8 points)
+
+```{r}
+#Insert your code here.
+model3 <- lm(Chance.of.Admit ~ GRE.Score + TOEFL.Score + CGPA, data = data)
+summary(model3)
+#The results indicate the highest significance is the two variables GRE.Score and CGPA although all variables are significant. According to the R-Squared values, the model seems pretty good. The model is also significant because the p-value is less than 0.05.
+```
+
+b) Write the regression equation associated with this multiple regression model. (8 points)
+
+```{r}
+
+#Insert your code here.
+#Chance.of.Admit = -1.5856984 + 0.0022660 * GRE.Score + 0.0031123 * TOEFL.Score + 0.1462844 * CGPA
+```
+
+c) Using this model:
+
+i- Find the chance of admit for the 3rd student and 23rd students in the dataset. (4 points)
+
+```{r}
+#Insert your code here.
+predict(model3)[c(3, 23)]
+```
+
+ii- Identify which student (3rd or 23rd) has higher chance than the other and print the difference between the chance of admit of these two students.(3 points)
+
+```{r}
+#Insert your code here.
+#The 23rd student has a higher chance because their chance of admission is higher with 90.83% compared to student 3 who has a chance of 62.43%
+predict(model3)[23] - predict(model3)[3]
+```
+
+d) Explain the difference between the linear regression models in Question 2 and in Question 3. (7 points)
+```{r}
+
+#Insert your code here.
+#The model in Q2 differs from the model in Q3 because the Q2 model compares the chance of admission against one variable to form a prediction whereas the Q3 model uses multiple variables as predictors and therefore would be a more accurate model compared to the Q2 model.
+```
