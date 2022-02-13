@@ -166,13 +166,21 @@ summary(model2)
 #### 21. A new product is just produced with the following data: Protein=0.1, TotalFat=37, Carbohydrate=400, Cholesterol=75, Sugar=NA, Calcium=35, Iron=NA, Potassium=35, VitaminC=10,	VitaminE=NA, VitaminD=NA. Based on the new model you created, what is the predicted value for Calories? (4 points)
 ```{r}
 # INSERT YOUR CODE HERE.
-new_product <- data.frame()
-predict(model2, )
+new_product <- data.frame(Protein = 0.1, TotalFat = 37, Carbohydrate = 400, Cholesterol = 75, Sugar = NA, Calcium = 35, Iron = NA, Potassium = 35, VitaminC = 10, VitaminE = NA, VitaminD = NA)
+CaloriesInitial <- predict(model2, new_product)
+CaloriesInitial
 ```
 
 #### 22. If the Carbohydrate amount increases from 400 to 40000 (10000% increase), how much change will occur on Calories in percent? Explain why? (4 points)
 ```{r}
 # INSERT YOUR CODE HERE AND EXPLAIN YOUR ANSWER AS A COMMENT.
+new_product2 <- data.frame(Protein = 0.1, TotalFat = 37, Carbohydrate = 40000, Cholesterol = 75, Sugar = NA, Calcium = 35, Iron = NA, Potassium = 35, VitaminC = 10, VitaminE = NA, VitaminD = NA)
+CaloriesNew <- predict(model2, new_product2)
+CaloriesNew
+#8112.97% increase calculation: ((150084.2-1827.405)/1827.405)*100.
+PercentIncrease <- (CaloriesNew-CaloriesInitial)/CaloriesInitial*100
+PercentIncrease
+#This increase occurs because the carbohydrate intercept value from the linear model equation (4.077907 +3.989679*Protein + 8.771904*TotalFat + 3.743859*Carbohydrate + 0.010980*Cholesterol) is 3.743859 which gets multiplied by the value of carbohydrates in the product (initially it was 400 and now it's 40000). When the Carbohydrates are 400, calories are 1827.405 and when Carbohydrates are 40000, calories are 150084.2.
 ```
 
 
