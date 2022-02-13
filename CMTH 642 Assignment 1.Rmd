@@ -1,0 +1,181 @@
+---
+title: 'CMTH 642 Data Analytics: Advanced Methods'
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+<center> <h1> Assignment 1 (10%) </h1> </center>
+<center>  <h3> [Tara Shingadia] </h2> </center>
+<center> <h3> [DJ0 & 500847789] </h2> </center>
+---
+
+#### 1. Read the csv files in the folder. (4 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+USDA_Macro <- read.csv("USDA_Macronutrients.csv", header=TRUE)
+USDA_Micro <- read.csv("USDA_Micronutrients.csv", header=TRUE)
+```
+
+#### 2. Merge the data frames using the variable "ID". Name the Merged Data Frame "USDA". (4 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+USDA <- merge(USDA_Macro, USDA_Micro, by='ID')
+```
+
+#### 3. Check the datatypes of the attributes. Delete the commas in the Sodium and Potasium records. Assign Sodium and Potasium as numeric data types. (4 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+str(USDA)
+USDA$Potassium <- as.numeric(gsub(",","",USDA$Potassium))
+USDA$Sodium <- as.numeric(gsub(",","",USDA$Sodium))
+```
+
+#### 4. Remove records (rows) with missing values in more than 4 attributes (columns). How many records remain in the data frame? (4 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+missing_value <- rowSums(is.na(USDA))
+missing4 <- missing_value > 4
+USDA1 <- USDA[!missing4,]
+nrow(USDA1)
+```
+
+#### 5. For records with missing values for Sugar, Vitamin E and Vitamin D, replace missing values with mean value for the respective variable. (4 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+USDA1$Sugar[is.na(USDA1$Sugar)] <- mean(USDA$Sugar, na.rm = TRUE)
+USDA1$VitaminE[is.na(USDA1$VitaminE)] <- mean(USDA$VitaminE, na.rm = TRUE)
+USDA1$VitaminD[is.na(USDA1$VitaminD)] <- mean(USDA$VitaminD, na.rm = TRUE)
+USDA1
+```
+
+#### 6. With a single line of code, remove all remaining records with missing values. Name the new Data Frame "USDAclean". How many records remain in the data frame? (5 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+USDAclean <- USDA1[complete.cases(USDA1),]
+nrow(USDAclean)
+```
+
+#### 7. Which food has the highest sodium level? (5 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+USDAclean$Description[which.max(USDAclean$Sodium)]
+```
+
+#### 8. Create a histogram of Vitamin C distribution in foods. (5 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+Vitamin_C <- USDAclean$VitaminC
+hist(Vitamin_C, xlim = c(0,120), breaks = 150, ylim = c(0,6000), col = 7, main = "Vitamin C Distribution in Food", xlab = "Vitamin C (mg)")
+```
+
+#### 9. Create one boxplot to illustrate the distribution of values for TotalFat, Protein and Carbohydrate. (5 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+colours = c('firebrick1','darkorange','goldenrod1')
+boxplot(USDAclean$TotalFat, USDAclean$Protein, USDAclean$Carbohydrate, names = c("Total Fat","Protein", "Carbohydrates"), col = colours)
+```
+
+#### 10. Create a scatterplot to illustrate the relationship between a food's TotalFat content and its Calorie content. (5 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+library(ggplot2)
+ggplot(data = USDAclean, aes(x = TotalFat, y = Calories)) + geom_point(color = "deepskyblue2")
+```
+
+#### 11. Add a variable to the data frame that takes value 1 if the food has higher sodium than average, 0 otherwise. Call this variable HighSodium. Do the same for High Calories, High Protein, High Sugar, and High Fat. How many foods have both high sodium and high fat? (5 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+USDAclean$HighSodium <- ifelse(USDAclean$Sodium > mean(USDAclean$Sodium), 1, 0)
+USDAclean$HighCalories <- ifelse(USDAclean$Calories > mean(USDAclean$Calories), 1, 0)
+USDAclean$HighProtein <- ifelse(USDAclean$Protein > mean(USDAclean$Protein), 1, 0)
+USDAclean$HighSugar <- ifelse(USDAclean$Sugar > mean(USDAclean$Sugar), 1, 0)
+USDAclean$HighFat <- ifelse(USDAclean$TotalFat > mean(USDAclean$TotalFat), 1, 0)
+
+length(which(USDAclean$HighSodium == 1 & USDAclean$HighFat == 1))
+```
+
+#### 12. Calculate the average amount of iron, for high and low protein foods. (5 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+mean(USDAclean[USDAclean$HighProtein == 1, 'Iron'])
+mean(USDAclean[USDAclean$HighProtein == 0, 'Iron'])
+```
+
+#### 13. Create a function for a "HealthCheck" program to detect unhealthy foods. Use the algorithm flowchart below as a basis. (5 points)
+```{r}
+require(jpeg)
+img<-readJPEG("HealthCheck.jpg")
+plot(1:4, ty = 'n', ann = F, xaxt = 'n', yaxt = 'n')
+rasterImage(img,1,1,4,4)
+```
+```{r}
+# INSERT YOUR ANSWER HERE
+HealthCheck <- function(x,y,z){ifelse(x == 1, ifelse(y == 1, ifelse(z == 1, "Fail", "Pass"), "Pass"), "Pass")}
+```
+
+#### 14. Add a new variable called HealthCheck to the data frame using the output of the function. (5 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+USDAclean$HealthCheck <- HealthCheck(USDAclean$HighSodium, USDAclean$HighSugar, USDAclean$HighFat)
+```
+
+#### 15. How many foods in the USDAclean data frame fail the HealthCheck? (5 points)
+```{r}
+# INSERT YOUR ANSWER HERE
+nrow(USDAclean[USDAclean$HealthCheck == "Fail",])
+```
+
+#### 16. Visualize the correlation among Calories, Protein, Total Fat, Carbohydrate, Sodium and Cholesterol. (5 points)
+```{r}
+# INSERT YOUR CODE HERE.
+library(corrplot)
+Attributes <- USDAclean[c("Calories", "Protein", "TotalFat", "Carbohydrate", "Sodium", "Cholesterol")]
+H = cor(Attributes)
+corrplot(H, method = 'number')
+```
+
+#### 17. Is the correlation between Calories and Total Fat statistically significant? Why? (5 points)
+```{r}
+# INSERT YOUR CODE HERE AND EXPLAIN YOUR ANSWER AS A COMMENT.
+test <- cor.test(USDAclean$Calories, USDAclean$TotalFat)
+test
+#The correlation between calories and total fat is statistically significant because it has a p value of 2.2e-16 which is < 0.05 at a 95% confidence interval
+```
+
+#### 18. Create a Linear Regression Model, using Calories as the dependent variable Protein, Total Fat, Carbohydrate, Sodium and Cholesterol as the independent variables. (4 points)
+```{r}
+# WRITE YOUR ANSWER AS A COMMENT.
+model1 <- lm(Calories ~ Protein + TotalFat + Carbohydrate + Sodium + Cholesterol, data = USDAclean)
+summary(model1)
+```
+
+#### 19. Which independent variable is the least significant? Why? (4 points)
+```{r}
+# INSERT YOUR CODE HERE AND EXPLAIN YOUR ANSWER AS A COMMENT.
+#Sodium is the least significant independent variable because according to the significance codes in the summary table above, it falls between the range of [0.1, 1] which is not significant.
+```
+
+#### 20. Create a new model by using only the significant independent variables. (4 points)
+```{r}
+# INSERT YOUR CODE HERE.
+model2 <- lm(Calories ~ Protein + TotalFat + Carbohydrate + Cholesterol, data = USDAclean)
+summary(model2)
+```
+
+#### 21. A new product is just produced with the following data: Protein=0.1, TotalFat=37, Carbohydrate=400, Cholesterol=75, Sugar=NA, Calcium=35, Iron=NA, Potassium=35, VitaminC=10,	VitaminE=NA, VitaminD=NA. Based on the new model you created, what is the predicted value for Calories? (4 points)
+```{r}
+# INSERT YOUR CODE HERE.
+new_product <- data.frame()
+predict(model2, )
+```
+
+#### 22. If the Carbohydrate amount increases from 400 to 40000 (10000% increase), how much change will occur on Calories in percent? Explain why? (4 points)
+```{r}
+# INSERT YOUR CODE HERE AND EXPLAIN YOUR ANSWER AS A COMMENT.
+```
+
+
+This is the end of Assignment 1
+
+Ceni Babaoglu, PhD
