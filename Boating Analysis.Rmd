@@ -1,0 +1,117 @@
+---
+title: "Boating Insights"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+library(choroplethr)
+library(choroplethrMaps)
+library(viridis)
+library(dplyr)
+library(sf)
+library(leaflet)
+```
+
+
+```{r}
+ReleasableAccidents <- read.csv("ReleasableAccidents.csv", header = TRUE)
+ReleasableDeaths <- read.csv("ReleasableDeaths.csv", header = TRUE)
+ReleasableInjuries <- read.csv("ReleasableInjuries.csv", header = TRUE)
+ReleasableVessels <- read.csv("ReleasableVessels.csv", header = TRUE)
+```
+
+
+```{r}
+str(ReleasableAccidents)
+```
+
+```{r}
+AccidentsPerDay <- as.data.frame(table(ReleasableAccidents['DayofWeek']))
+colnames(AccidentsPerDay) <- c('Day','Freq')
+AccidentsPerDay$Day <- factor(AccidentsPerDay$Day, levels = c('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'))
+DaysPlot <- ggplot(AccidentsPerDay, aes(x = Day, y = Freq, fill = Day)) + geom_bar(stat = "identity") + ggtitle('Frequency of Accidents Per Day in 2020') + scale_fill_viridis_d(option = 'D') + geom_text(aes(label = Freq), vjust = -0.4, colour = 'Black')
+DaysPlot
+```
+
+```{r}
+AccidentsPerStateData <- as.data.frame(table(ReleasableAccidents['State']))
+colnames(AccidentsPerStateData) <- c('State','Freq')
+StatesPlot <- ggplot(AccidentsPerStateData, aes(x = State, y = Freq, fill = State)) + geom_point() + ggtitle('Frequency of Accidents Per State in 2020') + scale_fill_viridis_d(option = 'D') + geom_text(aes(label = Freq), vjust = -0.4, colour = 'Black')
+
+AccidentsPerStateData
+
+```
+
+```{r}
+head(unique(AccidentsPerStateData$State),60)
+```
+
+
+```{r}
+#rename the table columns and recode the state codes to be compatible with choroplethr package
+AccidentsPerState <- AccidentsPerStateData %>% 
+                      rename(region = State, value = Freq) %>%
+                      mutate(region = recode(AccidentsPerStateData$State ,
+                                             'AZ' = 'arizona',
+                                             'AL' = 'alabama',
+                                             'AR' = 'arkansas',
+                                             'AZ' = 'arizona',
+                                             'CO' = 'colorado',
+                                             'CT' = 'connecticut',
+                                             'DC' = 'district of columbia',
+                                             'DE' = 'delaware',
+                                             'FL' = 'florida',
+                                             'GA' = 'georgia',
+                                             'HI' = 'hawaii',
+                                             'IA' = 'iowa',
+                                             'ID' = 'idaho',
+                                             'IL' = 'illinois',
+                                             'IN' = 'indiana',
+                                             'KS' = 'kansas',
+                                             'KY' = 'kentucky',
+                                             'LA' = 'louisiana',
+                                             'MA' = 'massachusetts',
+                                             'MD' = 'maryland',
+                                             'ME' = 'maine',
+                                             'MI' = 'michigan',
+                                             'MN' = 'minnesota',
+                                             'MO' = 'missouri',
+                                             'MS' = 'mississippi',
+                                             'MT' = 'montana',
+                                             'NC' = 'north carolina',
+                                             'ND' = 'north dakota',
+                                             'NE' = 'nebraska',
+                                             'NH' = 'new hampshire',
+                                             'NJ' = 'new jersey',
+                                             'NM' = 'new mexico',
+                                             'NV' = 'nevada',
+                                             'NY' = 'new york',
+                                             'OH' = 'ohio',
+                                             'OK' = 'oklahoma',
+                                             'OR' = 'oregon',
+                                             'RI' = 'rhode island',
+                                             'SC' = 'south carolina',
+                                             'SD' = 'south dakota',
+                                             'TN' = 'tennessee',
+                                             'TX' = 'texas',
+                                             'UT' = 'utah',
+                                             'VA' = 'virginia',
+                                             'VT' = 'vermont',
+                                             'WA' = 'washington',
+                                             'WI' = 'wisconsin',
+                                             'WV' = 'west virginia',
+                                             'WY' = 'wyoming'))
+                     
+```
+
+```{r}
+USA_Map <- state_choropleth(AccidentsPerState, num_colors = 9) + scale_fill_brewer(palette = 'YlOrBr') + 
+  labs(title = "USA Boating Accidents 2020", caption = "not including California and Pennsylvania")
+USA_Map
+```
+
+```{r}
+
+```
+
