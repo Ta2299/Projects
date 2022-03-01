@@ -29,9 +29,12 @@ str(ReleasableAccidents)
 ```{r}
 AccidentsPerDay <- as.data.frame(table(ReleasableAccidents['DayofWeek']))
 colnames(AccidentsPerDay) <- c('Day','Freq')
+
 AccidentsPerDay$Day <- factor(AccidentsPerDay$Day, levels = c('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'))
 DaysPlot <- ggplot(AccidentsPerDay, aes(x = Day, y = Freq, fill = Day)) + geom_bar(stat = "identity") + ggtitle('Frequency of Accidents Per Day in 2020') + scale_fill_viridis_d(option = 'D') + geom_text(aes(label = Freq), vjust = -0.4, colour = 'Black')
+
 DaysPlot
+
 ```
 
 ```{r}
@@ -111,6 +114,24 @@ USA_Map <- state_choropleth(AccidentsPerState, num_colors = 9) + scale_fill_brew
 USA_Map
 ```
 
+```{r}
+AccidentsPerStateData <- AccidentsPerStateData[with(AccidentsPerStateData, order(-Freq)),]
+Top_10_States <- AccidentsPerStateData[1:10,]
+Top_10_States
+```
+
+```{r}
+#create a table of water conditions and the frequency of accidents during each condition
+WaterConditionsData <- as.data.frame(table(ReleasableAccidents['WaterConditions']))
+colnames(WaterConditionsData) <- c('Water_Condition', 'Frequency')
+
+#plot the conditions on a graph
+WaterConditionsPlot <- ggplot(WaterConditionsData, aes(x = Water_Condition, y = Frequency, fill = Water_Condition)) + geom_bar(stat = "identity") + ggtitle('Frequency of Accidents According to Water Conditions 2020') + scale_fill_viridis_d(option = 'D') + geom_text(aes(label = Frequency), vjust = -0.4, colour = 'Black')
+
+WaterConditionsPlot
+
+
+```
 ```{r}
 
 ```
