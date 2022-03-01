@@ -1,8 +1,8 @@
 ---
 title: 'CMTH 642 Data Analytics: Advanced Methods'
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
   word_document: default
 ---
 <center> <h1> Assignment 1 (10%) </h1> </center>
@@ -46,7 +46,7 @@ nrow(USDA1)
 USDA1$Sugar[is.na(USDA1$Sugar)] <- mean(USDA$Sugar, na.rm = TRUE)
 USDA1$VitaminE[is.na(USDA1$VitaminE)] <- mean(USDA$VitaminE, na.rm = TRUE)
 USDA1$VitaminD[is.na(USDA1$VitaminD)] <- mean(USDA$VitaminD, na.rm = TRUE)
-USDA1
+head(USDA1)
 ```
 
 #### 6. With a single line of code, remove all remaining records with missing values. Name the new Data Frame "USDAclean". How many records remain in the data frame? (5 points)
